@@ -6,13 +6,13 @@ namespace Bayt2
 {
     class Program
     {
-        private static CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-        private const int TolDelayTime = 13000;
+        private static readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
+        private const int TolDelayTime = 3000;
         private const int MainDelayTime = 444;
 
         private static void Main()
         {
-            var tolTask = CreateLifeTimeTask(_cancellationTokenSource.Token);
+            var tolTask = CreateLifeTimeTask(CancellationTokenSource.Token);
             tolTask.Start();
 
             Console.CancelKeyPress += Console_CancelKeyPress;
@@ -23,11 +23,14 @@ namespace Bayt2
             {
                 Console.WriteLine($"Fibonacci number F({index++}) is: {number}");
                 Thread.Sleep(MainDelayTime);
-                if(_cancellationTokenSource.Token.IsCancellationRequested) break;
+                if(CancellationTokenSource.Token.IsCancellationRequested) break;
             }
 
             tolTask.Wait();
             Console.CancelKeyPress -= Console_CancelKeyPress;
+
+            Console.WriteLine("Press enter to exit...");
+            Console.ReadLine();
         }
 
         static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
@@ -35,7 +38,7 @@ namespace Bayt2
             Console.WriteLine("Cancelling");
             if (e.SpecialKey == ConsoleSpecialKey.ControlC)
             {
-                _cancellationTokenSource.Cancel();
+                CancellationTokenSource.Cancel();
                 e.Cancel = true;
             }
         }
@@ -47,9 +50,9 @@ namespace Bayt2
                 while(!cancellationToken.IsCancellationRequested)
                 {
                     var tol = Tools.GetProgramLifetime();
-                    Console.WriteLine($"Application time of life: {tol:F0} seconds");
+                    Console.WriteLine($"    Application time of life: {tol:F0} seconds");
                     await Task.Delay(TolDelayTime, cancellationToken)
-                        .ContinueWith(tsk => { }); ;
+                        .ContinueWith(tsk => { });
                 }
             });
         }

@@ -8,7 +8,7 @@ namespace Bayt2
     public class FibonacciNumbers : IEnumerable<BigInteger>, IEnumerator<BigInteger>
     {
         private Int64 _position = -1;
-        private BigInteger[] _fibonaciLast = {0, 1};
+        private readonly BigInteger[] _fibonacciLast = {0, 1};
 
         IEnumerator<BigInteger> IEnumerable<BigInteger>.GetEnumerator()
         {
@@ -33,11 +33,11 @@ namespace Bayt2
             get
             {
                 if (_position < 2)
-                    return _fibonaciLast[_position];
+                    return _fibonacciLast[_position];
 
-                var temp = _fibonaciLast.Sum();
-                _fibonaciLast[0] = _fibonaciLast[1];
-                _fibonaciLast[1] = temp;
+                var temp = _fibonacciLast.Sum();
+                _fibonacciLast[0] = _fibonacciLast[1];
+                _fibonacciLast[1] = temp;
                 return temp;
             }
         }

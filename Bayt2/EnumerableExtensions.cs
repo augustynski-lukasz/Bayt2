@@ -3,7 +3,7 @@ using System.Numerics;
 
 namespace Bayt2
 {
-    public static class Extensions
+    public static class EnumerableExtensions
     {
         public static BigInteger Sum(this IEnumerable<BigInteger> source)
         {
