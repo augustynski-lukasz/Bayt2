@@ -6,16 +6,16 @@ namespace Bayt2
 {
     class Program
     {
-        private static bool _cancelled;
-        private const int TolDelayTime = 3000;
+        private static CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private const int TolDelayTime = 13000;
         private const int MainDelayTime = 444;
 
-        static void Main(string[] args)
+        private static void Main()
         {
-            var tolTask = CreateLifeTimeTask();
+            var tolTask = CreateLifeTimeTask(_cancellationTokenSource.Token);
             tolTask.Start();
 
-            Console.CancelKeyPress += new ConsoleCancelEventHandler(Console_CancelKeyPress);
+            Console.CancelKeyPress += Console_CancelKeyPress;
             Console.WriteLine("Computing Fibonacci sequence, press Ctrl+C to cancel.");
 
             var index = 0;
@@ -23,11 +23,11 @@ namespace Bayt2
             {
                 Console.WriteLine($"Fibonacci number F({index++}) is: {number}");
                 Thread.Sleep(MainDelayTime);
-                if(_cancelled) break;
+                if(_cancellationTokenSource.Token.IsCancellationRequested) break;
             }
 
             tolTask.Wait();
-            Console.CancelKeyPress -= new ConsoleCancelEventHandler(Console_CancelKeyPress);
+            Console.CancelKeyPress -= Console_CancelKeyPress;
         }
 
         static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
@@ -35,20 +35,21 @@ namespace Bayt2
             Console.WriteLine("Cancelling");
             if (e.SpecialKey == ConsoleSpecialKey.ControlC)
             {
-                _cancelled = true;
+                _cancellationTokenSource.Cancel();
                 e.Cancel = true;
             }
         }
 
-        static Task CreateLifeTimeTask()
+        static Task CreateLifeTimeTask(CancellationToken cancellationToken)
         {            
             return new Task(async () =>
             {
-                while(!_cancelled)
+                while(!cancellationToken.IsCancellationRequested)
                 {
                     var tol = Tools.GetProgramLifetime();
                     Console.WriteLine($"Application time of life: {tol:F0} seconds");
-                    await Task.Delay(TolDelayTime);
+                    await Task.Delay(TolDelayTime, cancellationToken)
+                        .ContinueWith(tsk => { }); ;
                 }
             });
         }

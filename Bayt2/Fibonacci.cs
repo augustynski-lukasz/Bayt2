@@ -10,13 +10,9 @@ namespace Bayt2
         private Int64 _position = -1;
         private BigInteger[] _fibonaciLast = {0, 1};
 
-        public FibonacciNumbers()
-        {  
-        }
-
         IEnumerator<BigInteger> IEnumerable<BigInteger>.GetEnumerator()
         {
-            return (IEnumerator<BigInteger>)this;
+            return this;
         }
 
         public bool MoveNext()
@@ -53,7 +49,7 @@ namespace Bayt2
 
         public IEnumerator GetEnumerator()
         {
-            return (IEnumerator)this;
+            return this;
         }
     }
 }
